@@ -15,4 +15,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\RSM.Domain\RSM.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

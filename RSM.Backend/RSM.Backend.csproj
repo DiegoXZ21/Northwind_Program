@@ -10,4 +10,8 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.7" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\RSM.Infrastructure\RSM.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>
