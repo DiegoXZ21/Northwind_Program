@@ -33,3 +33,4 @@ C:\RSM\Final Assestment Part 1\Northwind_Program\RSM.Backend\obj\Debug\net10.0\r
 C:\RSM\Final Assestment Part 1\Northwind_Program\RSM.Backend\obj\Debug\net10.0\RSM.Backend.pdb
 C:\RSM\Final Assestment Part 1\Northwind_Program\RSM.Backend\obj\Debug\net10.0\RSM.Backend.genruntimeconfig.cache
 C:\RSM\Final Assestment Part 1\Northwind_Program\RSM.Backend\obj\Debug\net10.0\ref\RSM.Backend.dll
+C:\RSM\Final Assestment Part 1\Northwind_Program\RSM.Backend\obj\Debug\net10.0\RSM.Backend.sourcelink.json

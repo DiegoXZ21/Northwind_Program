@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("RSM.Backend")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+dbda6d3041e5929cc992b02282e69160afad5559")]
 [assembly: System.Reflection.AssemblyProductAttribute("RSM.Backend")]
 [assembly: System.Reflection.AssemblyTitleAttribute("RSM.Backend")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
