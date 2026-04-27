@@ -1,29 +1,32 @@
 using Microsoft.AspNetCore.Mvc;
 using RSM.Application.Services;
 
-[ApiController]
-[Route("api/[controller]")]
-public class ShippersController : ControllerBase
+namespace RSM.Backend.Controllers
 {
-    private readonly IShipperService _shipperService;
-    public ShippersController(IShipperService shipperService)
+    [ApiController]
+    [Route("api/[controller]")]
+    public class ShippersController : ControllerBase
     {
-        _shipperService = shipperService;
-    }
-
-    // GET: api/shippers
-    [HttpGet("sample")]
-    public IActionResult GetSample()
-    {
-        try
+        private readonly IShipperService _shipperService;
+        public ShippersController(IShipperService shipperService)
         {
-            var shippers = _shipperService.GetShippers();
-            return Ok(shippers);
+            _shipperService = shipperService;
         }
-        catch (Exception ex)
-        {
-            return BadRequest($"Error al consultar Shippers: {ex.Message}");
-        }
-    }
 
+        // GET: api/shippers
+        [HttpGet("sample")]
+        public IActionResult GetSample()
+        {
+            try
+            {
+                var shippers = _shipperService.GetShippers();
+                return Ok(shippers);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error when getting Shippers: {ex.Message}");
+            }
+        }
+
+    }
 }
