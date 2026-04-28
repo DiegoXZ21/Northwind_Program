@@ -13,13 +13,13 @@ namespace RSM.Backend.Controllers
             _customerService = customerService;
         }
 
-        // GET: api/Customer
+        // GET: api/Customer ?name=abc&city=xyz&country=def
         [HttpGet("sample")]
-        public IActionResult GetSample()
+        public IActionResult GetCustomers([FromQuery] string? name, [FromQuery] string? city, [FromQuery] string? country)
         {
             try
             {
-                var customers = _customerService.GetCustomers();
+                var customers = _customerService.GetCustomers(name, city, country);
                 return Ok(customers);
             }
             catch (Exception ex)
