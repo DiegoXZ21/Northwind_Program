@@ -22,6 +22,7 @@ namespace RSM.Domain.Models
 
         public Customer Customer { get; set; } = null!;
         public Shipper Shipper { get; set; } = null!;
+        public Employee Employee { get; set; } = null!;
     }
 
 }
