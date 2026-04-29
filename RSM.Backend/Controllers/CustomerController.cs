@@ -27,5 +27,19 @@ namespace RSM.Backend.Controllers
                 return BadRequest($"Error when trying to get customers: {ex.Message}");
             }
         }
+        // GET: api/Customer/dto ?name=abc&city=xyz&country=def
+        [HttpGet("dto")]
+        public IActionResult GetCustomerDtos([FromQuery] string? name, [FromQuery] string? city, [FromQuery] string? country)
+        {
+            try
+            {
+                var customerDtos = _customerService.GetCustomerDtos(name, city, country);
+                return Ok(customerDtos);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error when trying to get customer: {ex.Message}");
+            }
+        }
     }
 }
