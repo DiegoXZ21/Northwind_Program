@@ -27,5 +27,19 @@ namespace RSM.Backend.Controllers
                 return BadRequest($"Error when trying to get orders: {ex.Message}");
             }
         }
+
+        [HttpGet("{id}")]
+        public IActionResult GetOrder(int id)
+        {
+            try
+            {
+                var order = _orderService.GetOrder(id);
+                return Ok(order);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error when trying to get order: {ex.Message}");
+            }
+        }
     }
 }
