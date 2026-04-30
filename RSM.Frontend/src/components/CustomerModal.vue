@@ -2,10 +2,40 @@
     <q-dialog 
         :model-value="modelValue"
         @update:model-value="$emit('update:modelValue', $event)">
-        <q-card>
+        <q-card style="min-width: 800px; width: 900px">
             <q-card-section>
+                <div class="row q-col-gutter-md q-mb-md">
+                    <div class="col">
+                        <q-input 
+                        v-model="filters.company"
+                        label = "Company Name"
+                        dense
+                        filled
+                        />
+                    </div>
+
+                    <div class="col">
+                        <q-input 
+                        v-model="filters.city"
+                        label = "City"
+                        dense
+                        filled
+                        />
+                    </div>
+
+                    <div class="col">
+                        <q-input 
+                        v-model="filters.country"
+                        label = "Country"
+                        dense
+                        filled
+                        />
+                    </div>
+                </div>
+            </q-card-section>
+            <q-card-section style="height: 400px;">
                 <q-table 
-                    :rows="customers"
+                    :rows="filteredCustomers"
                     :columns="columns"
                     row-key="customerId"
                     @row-click="selectCustomer"
@@ -29,18 +59,39 @@ export default {
         return {
             customers: [],
             columns: [
-                { name: 'customerId', label: 'ID', field: 'customerId' },
-                { name: 'companyName', label: 'Company Name', field: 'companyName' },
-                { name: 'city', label: 'City', field: 'city' },
-                { name: 'country', label: 'Country', field: 'country' }
-            ]
+                { name: 'customerId', label: 'ID', field: 'customerId', align: 'center' },
+                { name: 'companyName', label: 'Company Name', field: 'companyName', align: 'center' },
+                { name: 'city', label: 'City', field: 'city', align: 'center' },
+                { name: 'country', label: 'Country', field: 'country', align: 'center' }
+            ],
+            filters: {
+                company: '',
+                city: '',
+                country: ''
+            }
         }
     }, 
     watch: {
-        modelValue(val) {
+        modelValue: {
+        immediate: true,
+        handler(val) {
             if (val) {
-            this.loadCustomers()
+                this.loadCustomers()
+            } else {
+                this.resetFilters()
             }
+        }
+    }
+    },
+    computed: {
+        filteredCustomers(){
+            return this.customers.filter(c => {
+                return(
+                    ((c.companyName || '').toLowerCase().includes(this.filters.company.toLowerCase())) &&
+                    ((c.city || '').toLowerCase().includes(this.filters.city.toLowerCase())) &&
+                    ((c.country || '').toLowerCase().includes(this.filters.country.toLowerCase()))
+                )
+            })
         }
     },
     methods: {
@@ -52,9 +103,16 @@ export default {
                 console.error('Error loading customers:', error)
             }
         },
-        selectCustomer (row) {
+        selectCustomer (evt, row) {
             this.$emit('select', row)
             this.$emit('update:modelValue', false)
+        },
+        resetFilters(){
+            this.filters = { 
+                company: '',
+                city: '',
+                country: ''
+            }
         }
     }
 }
