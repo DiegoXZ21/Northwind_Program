@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@quasar/extras": "^1.18.0",
+    "@quasar/vite-plugin": "^1.11.0",
     "axios": "^1.15.2",
     "chart.js": "^4.5.1",
     "jspdf": "^4.2.1",
