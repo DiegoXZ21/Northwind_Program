@@ -19,8 +19,11 @@
 import api from '../boot/axios'
 export default {
     props: { 
-        type: Boolean,
-        default: false },
+        modelValue: {
+            type: Boolean,
+        default: false
+        }
+    },
     emits: ['update:modelValue', 'select'],
     data () {
         return {
@@ -33,8 +36,12 @@ export default {
             ]
         }
     }, 
-    mounted() {
-        this.loadCustomers()
+    watch: {
+        modelValue(val) {
+            if (val) {
+            this.loadCustomers()
+            }
+        }
     },
     methods: {
         async loadCustomers() {
