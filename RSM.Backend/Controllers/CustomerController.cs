@@ -13,20 +13,6 @@ namespace RSM.Backend.Controllers
             _customerService = customerService;
         }
 
-        // GET: api/Customer ?name=abc&city=xyz&country=def
-        [HttpGet("sample")]
-        public IActionResult GetCustomers([FromQuery] string? name, [FromQuery] string? city, [FromQuery] string? country)
-        {
-            try
-            {
-                var customers = _customerService.GetCustomers(name, city, country);
-                return Ok(customers);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest($"Error when trying to get customers: {ex.Message}");
-            }
-        }
         // GET: api/Customer/dto ?name=abc&city=xyz&country=def
         [HttpGet("dto")]
         public IActionResult GetCustomerDtos([FromQuery] string? name, [FromQuery] string? city, [FromQuery] string? country)
@@ -39,6 +25,21 @@ namespace RSM.Backend.Controllers
             catch (Exception ex)
             {
                 return BadRequest($"Error when trying to get customer: {ex.Message}");
+            }
+        }
+
+        // GET: api/Customer/dto/{id}
+        [HttpGet("dto/{id}")]
+        public IActionResult GetCustomerShippingDtos([FromRoute] string id)
+        {
+            try
+            {
+                var customerShippingDtos = _customerService.GetCustomerShippingDtos(id);
+                return Ok(customerShippingDtos);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error when trying to get customer shipping info: {ex.Message}");
             }
         }
     }

@@ -35,24 +35,65 @@
             <div class="col-12 col-md-8">
 
                 <q-card class="q-pa-md">
-                <div class="text-h6 q-mb-md">Order Details</div>
-                <q-input
-                    v-model="order.orderDate"
-                    label="Order Date"
-                    type="date"
-                    outlined
-                    class="q-mb-sm"
-                />
-                <q-input
-                    v-model="order.shipAdress"
-                    label="Shipping Address"
-                    outlined
-                    class="q-mb-md"
-                />
-                
-                <div class="q-mt-md">
-                    <div id="map" style="height:300px; border-radius: 8px;"></div>
-                </div>
+                    <div class="text-h6 q-mb-md">Shipping Details</div>
+
+                    <div class="row q-col-gutter-md">
+
+                        <div class="col-12 col-md-6">
+                            <q-input
+                            v-model="order.requiredDate"
+                            label="Required Date"
+                            type="date"
+                            outlined
+                            />
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <q-input
+                            v-model="order.shipAddress"
+                            label="Shipping Address"
+                            outlined
+                            />
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <q-input
+                            v-model="order.shipCity"
+                            label="City"
+                            outlined
+                            />
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <q-input
+                            v-model="order.shipRegion"
+                            label="Region"
+                            outlined
+                            />
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <q-input
+                            v-model="order.shipCountry"
+                            label="Country"
+                            outlined
+                            />
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <q-input
+                            v-model="order.shipPostalCode"
+                            label="Postal Code"
+                            outlined
+                            />
+                        </div>
+
+                    </div>
+
+                    <div class="q-mt-lg">
+                        <div id="map" style="height:300px; border-radius: 8px;"></div>
+                    </div>
+
                 </q-card>
 
             </div>
@@ -70,24 +111,40 @@
 <script>
 import CustomerModal from './CustomerModal.vue';
 import EmployeeDropdown from './EmployeeDropdown.vue';
+import api from '../boot/axios';
 
 export default {
     components: { CustomerModal, EmployeeDropdown },
     data() {
         return {
-            order: { customerId: '', customerName: '', city: '', country: '', employeeId: null, orderDate: '', shipAdress: '' },
+            order: { customerId: '', customerName: '', employeeId: null, orderDate: '', shipAddress: '', shipCity: '', shipRegion: '', shipPostalCode: '', shipCountry: '' },
             showCustomerModal: false
         }
     },
     methods: {
         saveOrder() { console.log ('Order Saved', this.order) },
-        setCustomer (customer) {
+        async setCustomer (customer) {
             this.order = {
                 ...this.order,
                 customerId: customer.customerId,
                 customerName: customer.companyName,
                 city: customer.city,
                 country: customer.country
+            }
+
+            try {
+                const response = await api.get(`/Customer/dto/${customer.customerId}`)
+
+                const data = response.data[0]
+
+                this.order.shipAddress = data.address
+                this.order.shipCountry = data.country
+                this.order.shipCity = data.city
+                this.order.shipRegion = data.region
+                this.order.shipPostalCode = data.postalCode
+
+            } catch (error) {
+                console.error('Error setting customer:', error);
             }
         }
     }
