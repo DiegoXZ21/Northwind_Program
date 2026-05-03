@@ -38,8 +38,30 @@
                     :rows="filteredCustomers"
                     :columns="columns"
                     row-key="customerId"
+                    :loading="loading"
                     @row-click="selectCustomer"
-                />
+                >
+            
+                <template v-slot:loading>
+                    <q-inner-loading showing>
+                        <q-spinner-dots color="primary" size="50px" />
+                    </q-inner-loading>
+                </template>
+
+                <template v-slot:no-data>
+                    <div class="full-width text-center q-pa-md">
+                        <q-icon name="search_off" size="40px" class="q-mb-sm" />
+                        <div v-if="filters.company || filters.city || filters.country">
+                            No results found
+                        </div>
+
+                        <div v-else>
+                            No customers available
+                        </div>
+                    </div>
+                </template>
+
+                </q-table>
             </q-card-section>
         </q-card>
     </q-dialog>
@@ -58,6 +80,7 @@ export default {
     data () {
         return {
             customers: [],
+            loading: false,
             columns: [
                 { name: 'customerId', label: 'ID', field: 'customerId', align: 'center' },
                 { name: 'companyName', label: 'Company Name', field: 'companyName', align: 'center' },
@@ -96,11 +119,14 @@ export default {
     },
     methods: {
         async loadCustomers() {
+            this.loading = true
             try {
                 const response = await api.get('/Customer/dto')
                 this.customers = response.data
             } catch (error) {
                 console.error('Error loading customers:', error)
+            } finally {
+                this.loading = false
             }
         },
         selectCustomer (evt, row) {
