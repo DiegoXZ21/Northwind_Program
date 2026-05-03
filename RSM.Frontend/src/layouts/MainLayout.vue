@@ -17,7 +17,7 @@
         <q-btn flat dense color="white" icon="dashboard" label="Dashboard" to="/dashboard" />
         <q-btn flat dense color="white" icon="list" label="Orders" to="/orders" />
         <q-btn flat dense color="white" icon="bar_chart" label="Reports" to="/reports" />
-        <q-btn flat dense color="white" icon="people" label="Customers" to="/customers" />
+        <q-btn flat dense color="white" icon="inventory" label="Inventory" to="/inventory" />
 
       </q-toolbar>
     </q-header>
