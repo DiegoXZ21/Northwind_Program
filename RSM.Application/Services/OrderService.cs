@@ -9,6 +9,10 @@ namespace RSM.Application.Services
     {
         List<OrderDetailDto> GetOrders(string? name);
         List<OrderDetailDto> GetOrder(int OrderId);
+
+        List<int> GetOrderYears();
+        List<OrdersByCountryDto> GetOrderYearsByCountryAndYear(int year);
+        List<OrdersByMonthDto> GetOrdersByMonth(int year);
     }
 
     public class OrderService : IOrderService
@@ -76,6 +80,44 @@ namespace RSM.Application.Services
                         });
 
             return result.ToList();
+        }
+
+        public List<int> GetOrderYears()
+        {
+            return _context.Orders
+                .Where(o => o.OrderDate != null)
+                .Select(o => o.OrderDate!.Value.Year)
+                .Distinct()
+                .OrderBy(y => y)
+                .ToList();
+        }
+
+        public List<OrdersByCountryDto> GetOrderYearsByCountryAndYear(int year)
+        {
+            return _context.Orders
+                .Where(o => o.OrderDate != null && o.OrderDate.Value.Year == year)
+                .GroupBy(o => o.ShipCountry ?? "Unknown")
+                .Select(g => new OrdersByCountryDto
+                {
+                    Country = g.Key,
+                    Total = g.Count()
+                })
+                .OrderByDescending(x => x.Total)
+                .ToList();
+        }
+
+        public List<OrdersByMonthDto> GetOrdersByMonth(int year)
+        {
+            return _context.Orders
+            .Where(o => o.OrderDate.HasValue && o.OrderDate.Value.Year == year)
+            .GroupBy(o => o.OrderDate!.Value.Month)
+            .Select(g => new OrdersByMonthDto
+            {
+                Month = g.Key,
+                Total = g.Count()
+            })
+            .OrderBy(x => x.Month)
+            .ToList();
         }
     }
 }

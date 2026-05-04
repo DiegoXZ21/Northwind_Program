@@ -41,5 +41,48 @@ namespace RSM.Backend.Controllers
                 return BadRequest($"Error when trying to get order: {ex.Message}");
             }
         }
+
+        [HttpGet("years")]
+        public IActionResult GetYears()
+        {
+            try
+            {
+                var years = _orderService.GetOrderYears();
+                return Ok(years);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error when trying to get order years: {ex.Message}");
+            }
+        }
+
+        [HttpGet("countries-by-year")]
+        public IActionResult GetCountriesByYear([FromQuery] int year)
+        {
+            try
+            {
+                var data = _orderService.GetOrderYearsByCountryAndYear(year);
+                return Ok(data);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error when trying to get countries by year: {ex.Message}");
+            }
+            
+        }
+
+        [HttpGet("monthly-orders")]
+        public IActionResult GetMonthlyOrders(int year)
+        {
+            try
+            {
+                var result = _orderService.GetOrdersByMonth(year);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error getting monthly orders: {ex.Message}");
+            }
+        }
     }
 }
