@@ -17,6 +17,16 @@ namespace RSM.Infrastructure.Data
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Employee> Employees { get; set; }
+        public DbSet<OrderDetails> OrderDetails {get; set;}
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<OrderDetails>()
+            .ToTable("Order Details")
+                .HasKey(od => new { od.OrderId, od.ProductId });
+
+            base.OnModelCreating(modelBuilder);
+        }
         
     }
 }

@@ -5,6 +5,7 @@ import DashboardPage from '../pages/DashBoardPage.vue'
 import OrdersPage from '../pages/OrdersPage.vue'
 import ReportsPage from '../pages/ReportsPage.vue'
 import InventoryPage from '../pages/InventoryPage.vue'
+import OrdersReportPage from '../pages/OrdersReportPage.vue'
 
 const routes = [
     {
@@ -15,7 +16,8 @@ const routes = [
             { path: 'dashboard', component: DashboardPage },
             {path: 'orders', component: OrdersPage },
             {path: 'reports', component: ReportsPage },
-            {path: 'inventory', component: InventoryPage }
+            {path: 'inventory', component: InventoryPage },
+            {path: 'ordersReport', component: OrdersReportPage}
         ]
         
     }

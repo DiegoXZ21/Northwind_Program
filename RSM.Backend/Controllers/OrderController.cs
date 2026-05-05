@@ -13,33 +13,18 @@ namespace RSM.Backend.Controllers
             _orderService = orderService;
         }
 
-        // GET: api/Order ?name=abc
-        [HttpGet("sample")]
-        public IActionResult GetOrders([FromQuery] string? name)
+        [HttpGet]
+        public IActionResult GetOrders(int? year, int? month, int? week, string? country)
         {
-            try
-            {
-                var orders = _orderService.GetOrders(name);
-                return Ok(orders);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest($"Error when trying to get orders: {ex.Message}");
-            }
+            var result = _orderService.GetOrders(year, month, week, country);
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetOrder(int id)
+        public IActionResult GetOrderDetail(int id)
         {
-            try
-            {
-                var order = _orderService.GetOrder(id);
-                return Ok(order);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest($"Error when trying to get order: {ex.Message}");
-            }
+            var result = _orderService.GetOrderDetail(id);
+            return Ok(result);
         }
 
         [HttpGet("years")]

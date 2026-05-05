@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.EntityFrameworkCore;
 using RSM.Application.Dtos;
 using RSM.Domain.Models;
@@ -7,9 +8,9 @@ namespace RSM.Application.Services
 {
     public interface IOrderService
     {
-        List<OrderDetailDto> GetOrders(string? name);
-        List<OrderDetailDto> GetOrder(int OrderId);
 
+        List<OrderListDto> GetOrders(int? year, int? month, int? week, string? country);
+        OrderDetailDto GetOrderDetail(int orderId);
         List<int> GetOrderYears();
         List<OrdersByCountryDto> GetOrderYearsByCountryAndYear(int year);
         List<OrdersByMonthDto> GetOrdersByMonth(int year);
@@ -23,63 +24,130 @@ namespace RSM.Application.Services
             _context = context;
         }
 
-        public List<OrderDetailDto> GetOrders(string? name)
+        public List<OrderListDto> GetOrders(int? year, int? month, int? week, string? country)
         {
-            IQueryable<Order> query = _context.Orders
-                        .Include(o=> o.Customer)
-                        .Include(o=> o.Shipper);
-
-            if (!string.IsNullOrEmpty(name))
-            {
-                query = query.Where(o => o.Customer.CompanyName.Contains(name));
-            }
-            var result = query.Select(o => new OrderDetailDto
-                        {
-                            OrderId = o.OrderId,
-                            CustomerId = o.CustomerId,
-                            CompanyName = o.Customer.CompanyName,
-                            EmployeeId = o.EmployeeId,
-                            Freight = o.Freight,
-                            OrderDate = o.OrderDate,
-                            RequiredDate = o.RequiredDate,
-                            ShipAddress = o.ShipAddress,
-                            ShipCity = o.ShipCity,
-                            ShipCountry = o.ShipCountry,
-                            ShipName = o.ShipName,
-                            ShipPostalCode = o.ShipPostalCode,
-                            ShipRegion = o.ShipRegion,
-                            ShipperName = o.Shipper.CompanyName
-                        });
-
-            
-
-            return result.ToList();
-        }
-        public List<OrderDetailDto> GetOrder(int OrderId)
-        {
-            var result = _context.Orders
+            var query = _context.Orders
                         .Include(o => o.Customer)
-                        .Include(o => o.Shipper)
-                        .Where(o => o.OrderId == OrderId)
-                        .Select(o => new OrderDetailDto
-                        {
-                            OrderId = o.OrderId,
-                            CustomerId = o.CustomerId,
-                            CompanyName = o.Customer.CompanyName,
-                            EmployeeId = o.EmployeeId,
-                            Freight = o.Freight,
-                            OrderDate = o.OrderDate,
-                            RequiredDate = o.RequiredDate,
-                            ShipAddress = o.ShipAddress,
-                            ShipCity = o.ShipCity,
-                            ShipCountry = o.ShipCountry,
-                            ShipName = o.ShipName,
-                            ShipPostalCode = o.ShipPostalCode,
-                            ShipRegion = o.ShipRegion,
-                            ShipperName = o.Shipper.CompanyName
-                        });
+                        .Include(o => o.OrderDetails)
+                        .AsQueryable();
 
-            return result.ToList();
+            if (year.HasValue)
+            {
+                query = query.Where(o => 
+                    o.OrderDate.HasValue &&
+                    o.OrderDate.Value.Year == year.Value
+                );
+            }
+
+            if (week.HasValue)
+            {
+                query = query.AsEnumerable()
+                    .Where(o =>
+                        o.OrderDate.HasValue &&
+                        CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(
+                            o.OrderDate.Value,
+                            CalendarWeekRule.FirstDay,
+                            DayOfWeek.Monday
+                        ) == week.Value
+                    )
+                    .AsQueryable();
+            }
+            
+            if (month.HasValue)
+            {
+                query = query.Where(o => 
+                    o.OrderDate.HasValue &&
+                    o.OrderDate.Value.Month == month.Value
+                );
+            }
+
+            if (!string.IsNullOrEmpty(country))
+            {
+                query = query.Where(o =>
+                    o.ShipCountry != null &&
+                    o.ShipCountry.Contains(country)
+                );
+            }
+
+            var data = query.Select(o => new
+            {
+                o.OrderId,
+                CustomerName = o.Customer.CompanyName,
+                OrderDate = o.OrderDate ?? DateTime.MinValue,
+                Country = o.ShipCountry ?? "",
+                o.Status,
+
+                TotalAmount = o.OrderDetails
+                    .Sum(d => d.UnitPrice * d.Quantity * (1 - (decimal)d.Discount)),
+
+                ProductCount = o.OrderDetails.Count
+            }).ToList();
+
+            return data.Select(o => new OrderListDto
+            {
+                OrderId = o.OrderId,
+                CustomerName = o.CustomerName,
+                OrderDate = o.OrderDate,
+                Country = o.Country,
+
+                Status = o.Status switch
+                {
+                    0 => "Pending",
+                    1 => "Processing",
+                    2 => "Shipped",
+                    3 => "Completed",
+                    4 => "Cancelled",
+                    _ => "Unknown"
+                },
+
+                TotalAmount = o.TotalAmount,
+                ProductCount = o.ProductCount
+            }).ToList();
+        }
+        
+        public OrderDetailDto GetOrderDetail(int orderId)
+        {
+            var order = _context.Orders
+                .Include(o => o.Customer)
+                .Include(o => o.OrderDetails)
+                .ThenInclude(d => d.Product)
+                .FirstOrDefault(o => o.OrderId == orderId);
+
+            if (order == null)
+                throw new Exception("Order not found");
+
+            var items = order.OrderDetails.Select(d => new OrderItemDto
+            {
+                ProductName = d.Product.ProductName,
+                Quantity = d.Quantity,
+                UnitPrice = d.UnitPrice,
+                Discount = d.Discount
+            }).ToList();
+
+            return new OrderDetailDto
+            {
+                OrderId = order.OrderId,
+                OrderDate = order.OrderDate ?? DateTime.Now,
+                Status = order.Status switch
+                {
+                    0 => "Pending",
+                    1 => "Processed",
+                    2 => "Shipped",
+                    3 => "Completed",
+                    4 => "Cancelled",
+                    _ => "Unknown"
+                },
+                Freight = order.Freight ?? 0,
+
+                CustomerName = order.Customer.CompanyName,
+                Address = order.ShipAddress ?? "",
+                City = order.ShipCity ?? "",
+                Country = order.ShipCountry ?? "",
+
+                Items = items,
+
+                Total = items.Sum(i => i.Total) + (order.Freight ?? 0)
+            };
         }
 
         public List<int> GetOrderYears()

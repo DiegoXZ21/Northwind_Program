@@ -19,10 +19,15 @@ namespace RSM.Domain.Models
         public string? ShipRegion { get; set; }
         public string? ShipPostalCode { get; set; }
         public string? ShipCountry { get; set; }
+        public int Status { get; set; }
+        public decimal? Latitude { get; set; }
+        public decimal? Longitude { get; set; }
 
         public Customer Customer { get; set; } = null!;
         public Shipper Shipper { get; set; } = null!;
         public Employee Employee { get; set; } = null!;
+
+        public ICollection<OrderDetails> OrderDetails { get; set; } = new List<OrderDetails>();
     }
 
 }
