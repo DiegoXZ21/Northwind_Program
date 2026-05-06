@@ -75,6 +75,17 @@
                 v-model:selected="selected"
             >
 
+            <template v-slot:body-cell-actions="props">
+                <q-td :props="props">
+                    <q-btn 
+                        flat
+                        dense
+                        icon="visibility"
+                        color="primary"
+                        @click="goToDetail(props.row.orderId)"
+                    />
+                </q-td>
+            </template>
 
 
             <template>
@@ -133,7 +144,8 @@ export default {
                 { name: 'country', label: 'Country', field: 'country', align: 'center' },
                 { name: 'status', label: 'Status', field: 'status', align: 'center' },
                 { name: 'totalAmount', label: 'Total', field: 'totalAmount', align: 'center',  format: val => new Intl.NumberFormat('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}).format(val ?? 0)},
-                { name: 'productCount', label: 'Products', field: 'productCount', align: 'center' }
+                { name: 'productCount', label: 'Products', field: 'productCount', align: 'center' },
+                { name: 'actions', label: 'Actions', field: 'actions', align: 'center'}
             ]
         }
     },
@@ -198,6 +210,9 @@ export default {
             }
 
             generateOrdersExcel(this.selected, this.filters)
+        },
+        goToDetail(orderId) {
+            this.$router.push(`/orders/${orderId}`)
         }
     }
 }

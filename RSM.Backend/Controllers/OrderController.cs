@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using RSM.Application.Services;
+using RSM.Application.Dtos;
 
 namespace RSM.Backend.Controllers
 {
@@ -8,9 +9,11 @@ namespace RSM.Backend.Controllers
     public class OrderController : ControllerBase
     {
         public readonly IOrderService _orderService;
-        public OrderController(IOrderService orderService)
+        public readonly IShipperService _shipperService;
+        public OrderController(IOrderService orderService, IShipperService shipperService)
         {
             _orderService = orderService;
+            _shipperService = shipperService;
         }
 
         [HttpGet]
@@ -67,6 +70,71 @@ namespace RSM.Backend.Controllers
             catch (Exception ex)
             {
                 return BadRequest($"Error getting monthly orders: {ex.Message}");
+            }
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateOrder(int id, [FromBody] UpdateOrderDto dto)
+        {
+            if (id != dto.OrderId)
+                return BadRequest("Invalid order id");
+
+            try
+            {
+                await _orderService.UpdateOrderAsync(dto);
+
+                return Ok("Order updated succesfully");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error updating order: {ex.Message}");
+            }
+        }
+
+        [HttpGet("shippers")]
+        public IActionResult GetShippers()
+        {
+            try
+            {
+                var result = _shipperService.GetShippers();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error getting shippers: {ex.Message}");
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteOrder(int id)
+        {
+            try
+            {
+                await _orderService.DeleteOrderAsync(id);
+
+                return Ok("Order deleted successfully");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut("{id}/status")]
+        public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateOrderStatusDto dto)
+        {
+            try
+            {
+                await _orderService.UpdateOrderStatusAsync(id, dto.Status);
+
+                return Ok(new
+                {
+                    message = "Status updated successfully"
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
     }

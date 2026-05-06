@@ -58,5 +58,19 @@ namespace RSM.Backend.Controllers
                 return BadRequest($"Error when trying to update inventory: {ex.Message}");
             }
         }
+
+        [HttpGet("available")]
+        public IActionResult GetAvailableProducts()
+        {
+            try
+            {
+                var data = _productService.GetAvailableProducts();
+                return Ok(data);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error getting products: {ex.Message}");
+            }
+        }
     }
 }

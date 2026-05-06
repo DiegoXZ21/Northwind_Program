@@ -8,8 +8,8 @@ namespace RSM.Application.Services
     {
         List<Product> GetProducts(string? name, string? category);
         List<ProductInventoryDto> GetInventory(string? name, string? category);
-
         void UpdateInventory(int productId, short unitsInStock);
+        List<AvailableProductDto> GetAvailableProducts();
     }
 
     public class ProductService : IProductService
@@ -72,6 +72,21 @@ namespace RSM.Application.Services
             _context.SaveChanges();
         }
 
+        public List<AvailableProductDto> GetAvailableProducts()
+        {
+            var products = _context.Products
+                            .Where(p => p.Discontinued == false && p.UnitsInStock > 0)
+                            .Select(p => new AvailableProductDto
+                            {
+                                ProductId = p.ProductId,
+                                ProductName = p.ProductName,
+                                UnitPrice = p.UnitPrice ?? 0,
+                                UnitsInStock = p.UnitsInStock ?? 0,
+                                QuantityPerUnit = p.QuantityPerUnit
+                            }).ToList();
+            
+            return products;
+        }
 
     }
 }

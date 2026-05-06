@@ -6,6 +6,7 @@ import OrdersPage from '../pages/OrdersPage.vue'
 import ReportsPage from '../pages/ReportsPage.vue'
 import InventoryPage from '../pages/InventoryPage.vue'
 import OrdersReportPage from '../pages/OrdersReportPage.vue'
+import OrderDetail from '../pages/OrderDetailPage.vue'
 
 const routes = [
     {
@@ -17,7 +18,8 @@ const routes = [
             {path: 'orders', component: OrdersPage },
             {path: 'reports', component: ReportsPage },
             {path: 'inventory', component: InventoryPage },
-            {path: 'ordersReport', component: OrdersReportPage}
+            {path: 'ordersReport', component: OrdersReportPage},
+            {path: 'orders/:id', component: OrderDetail}
         ]
         
     }

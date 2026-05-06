@@ -1,6 +1,7 @@
-using Microsoft.EntityFrameworkCore;
-using RSM.Infrastructure.Data;
 using RSM.Application.Services;
+using RSM.Application.Services.External;
+using RSM.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +31,8 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddScoped<IOrderDetailService, OrderDetailService>();
+builder.Services.AddHttpClient<IGoogleAddressService, GoogleAddressService>();
 
 var app = builder.Build();
 
