@@ -17,9 +17,9 @@ namespace RSM.Backend.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetOrders(int? year, int? month, int? week, string? country)
+        public IActionResult GetOrders(int? year, int? month, int? week, string? country, int? status)
         {
-            var result = _orderService.GetOrders(year, month, week, country);
+            var result = _orderService.GetOrders(year, month, week, country, status);
             return Ok(result);
         }
 
@@ -130,6 +130,24 @@ namespace RSM.Backend.Controllers
                 return Ok(new
                 {
                     message = "Status updated successfully"
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateOrder(CreateOrderDto dto)
+        {
+            try
+            {
+                await _orderService.CreateOrderAsync(dto);
+
+                return Ok(new
+                {
+                    message = "Order created successfully"
                 });
             }
             catch (Exception ex)

@@ -60,6 +60,17 @@
           :disable="readonly"
         />
       </div>
+      <div class="col-12 col-md-4">
+        <q-input
+          v-model="localModel.freight"
+          label="Freight"
+          type="number"
+          outlined
+          dense
+          :readonly="readonly"
+        />
+      </div>
+      
 
       <div class="col-12">
         <q-banner
@@ -83,7 +94,7 @@
     />
 
     <div v-if="lat && lng" class="q-mt-md text-caption">
-      📍 Lat: {{ lat }} | Lng: {{ lng }}
+       Lat: {{ lat }} | Lng: {{ lng }}
     </div>
 
     <div id="map" class="q-mt-md" style="height: 500px;" v-show="lat && lng"></div>

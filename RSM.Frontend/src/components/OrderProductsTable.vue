@@ -16,7 +16,7 @@
             min="1"
             :max="props.row.unitsInStock"
             :disable="props.row.discontinued"
-            @blur="validateStock(props.row)"
+            @update:model-value="validateStock(props.row)"
             />
         </div>
         <div v-else>
@@ -84,6 +84,26 @@ export default {
         },
         { name: 'actions', label: '', align: 'center' }
       ]
+    }
+  },
+  methods: {
+    validateStock(product) {
+
+      product.quantity = Number(product.quantity)
+
+      if (isNaN(product.quantity) || product.quantity < 1) {
+        product.quantity = 1
+      }
+
+      if (product.quantity > product.unitsInStock) {
+
+        product.quantity = product.unitsInStock
+
+        this.$q.notify({
+          type: 'warning',
+          message: `Only ${product.unitsInStock} units available`
+        })
+      }
     }
   }
 }

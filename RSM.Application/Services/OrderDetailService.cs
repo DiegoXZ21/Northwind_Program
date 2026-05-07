@@ -45,7 +45,7 @@ namespace RSM.Application.Services
                 ShipperId = order.ShipperId,
 
                 Status = order.Status,
-
+                Freight = order.Freight ?? 0,
                 Latitude = order.Latitude,
                 Longitude = order.Longitude,
                 Products = order.OrderDetails.Select(d => new OrderProductDto

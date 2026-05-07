@@ -11,6 +11,7 @@ namespace RSM.Application.Dtos
         public string? Region { get; set; }
         public string? Country { get; set; }
         public string? PostalCode { get; set; }
+        public decimal Freight {get; set;}
 
         public int? ShipperId { get; set; }
 

@@ -12,15 +12,15 @@ namespace RSM.Application.Services
     public interface IOrderService
     {
 
-        List<OrderListDto> GetOrders(int? year, int? month, int? week, string? country);
+        List<OrderListDto> GetOrders(int? year, int? month, int? week, string? country, int? status);
         OrderDetailDto GetOrderDetail(int orderId);
         List<int> GetOrderYears();
         List<OrdersByCountryDto> GetOrderYearsByCountryAndYear(int year);
         List<OrdersByMonthDto> GetOrdersByMonth(int year);
         Task UpdateOrderAsync(UpdateOrderDto dto);
         Task<bool> DeleteOrderAsync(int orderId);
-
         Task UpdateOrderStatusAsync(int orderId, int newStatus);
+        Task CreateOrderAsync(CreateOrderDto dto);
     }
 
     public class OrderService : IOrderService
@@ -34,7 +34,7 @@ namespace RSM.Application.Services
             _googleService = googleService;
         }
 
-        public List<OrderListDto> GetOrders(int? year, int? month, int? week, string? country)
+        public List<OrderListDto> GetOrders(int? year, int? month, int? week, string? country, int? status)
         {
             var query = _context.Orders
                         .Include(o => o.Customer)
@@ -79,6 +79,11 @@ namespace RSM.Application.Services
                 );
             }
 
+            if (status.HasValue)
+            {
+                query = query.Where(o => o.Status == status);
+            }
+                
             var data = query.Select(o => new
             {
                 o.OrderId,
@@ -233,6 +238,7 @@ namespace RSM.Application.Services
             order.ShipRegion = dto.Region;
             order.ShipCountry = dto.Country;
             order.ShipPostalCode = dto.PostalCode;
+            order.Freight = dto.Freight;
 
             order.Latitude = (decimal?)addressResult.Latitude;
             order.Longitude = (decimal?)addressResult.Longitude;
@@ -322,6 +328,17 @@ namespace RSM.Application.Services
 
             if (order.OrderDetails != null && order.OrderDetails.Any())
             {
+                foreach (var detail in order.OrderDetails)
+                {
+                    var product = await _context.Products
+                        .FirstOrDefaultAsync(p => p.ProductId == detail.ProductId);
+
+                    if (product != null)
+                    {
+                        product.UnitsInStock = (short)((product.UnitsInStock ?? 0) + detail.Quantity);
+                    }
+                }
+
                 _context.OrderDetails.RemoveRange(order.OrderDetails);
             }
 
@@ -353,6 +370,82 @@ namespace RSM.Application.Services
                 throw new Exception("Invalid status transition");
 
             order.Status = newStatus;
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task CreateOrderAsync(CreateOrderDto dto)
+        {
+            if (dto.Products == null || !dto.Products.Any())
+                throw new Exception("Order must contain at least one product");
+
+            if (dto.ShipperId <= 0)
+                throw new Exception("Shipper is required");
+
+            var addressResult = await _googleService.ValidateAddressAsync(new AddressDto
+            {
+                Address = dto.ShippingAddress,
+                City = dto.City,
+                Region = dto.Region,
+                Country = dto.Country,
+                PostalCode = dto.PostalCode
+            });
+
+            if (!addressResult.IsValid)
+                throw new Exception("Invalid shipping address");
+
+            var order = new Order
+            {
+                CustomerId = dto.CustomerId,
+                EmployeeId = dto.EmployeeId,
+                OrderDate = DateTime.Now,
+                RequiredDate = DateTime.Now.AddMonths(1),
+
+                ShipperId = dto.ShipperId,
+
+                ShipName = dto.ShipName,
+                Freight = dto.Freight,
+
+                ShipAddress = dto.ShippingAddress,
+                ShipCity = dto.City,
+                ShipRegion = dto.Region,
+                ShipCountry = dto.Country,
+                ShipPostalCode = dto.PostalCode,
+
+                Latitude = (decimal?)addressResult.Latitude,
+                Longitude = (decimal?)addressResult.Longitude,
+
+                Status = 0,
+
+                OrderDetails = new List<OrderDetails>()
+            };
+
+            foreach (var item in dto.Products)
+            {
+                var product = await _context.Products
+                    .FirstOrDefaultAsync(p => p.ProductId == item.ProductId);
+
+                if (product == null)
+                    throw new Exception($"Product {item.ProductId} not found");
+
+                if (product.Discontinued == true)
+                    throw new Exception($"Product {product.ProductName} is discontinued");
+
+                if ((product.UnitsInStock ?? 0) < item.Quantity)
+                    throw new Exception($"Not enough stock for {product.ProductName}");
+
+                order.OrderDetails.Add(new OrderDetails
+                {
+                    ProductId = item.ProductId,
+                    Quantity = (short)item.Quantity,
+                    Discount = (float)item.Discount,
+                    UnitPrice = product.UnitPrice ?? 0
+                });
+
+                product.UnitsInStock = (short?)((product.UnitsInStock ?? 0) - item.Quantity);
+            }
+
+            _context.Orders.Add(order);
 
             await _context.SaveChangesAsync();
         }

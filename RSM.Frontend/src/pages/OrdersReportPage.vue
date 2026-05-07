@@ -42,7 +42,20 @@
                     />
                 </div>
 
-                <div class="col-12 col-md-3 flex items-end justify-end q-gutter-sm">
+                <div class="col-12 col-md-3">
+                    <q-select
+                        v-model="filters.status"
+                        :options="statusOptions"
+                        label="Status"
+                        dense
+                        outlined
+                        emit-value
+                        map-options
+                        clearable
+                    />
+                </div>
+
+                <div class="col-12 col-md-12 flex justify-end q-gutter-sm">
 
                     <q-btn
                         color="primary"
@@ -95,7 +108,13 @@
             </template>
 
 
-            <template>
+            <template v-slot:loading>
+                <q-inner-loading showing>
+                    <q-spinner-dots size="40px" />
+                </q-inner-loading>
+            </template>
+
+            <template v-slot:no-data>
                 <div class="full-width text-center q-pa-md">
                     No orders found
                 </div>
@@ -115,6 +134,13 @@ export default {
             orders: [],
             selected: [],
             loading: false,
+            statusOptions: [
+                { label: 'Pending', value: 0 },
+                { label: 'Processing', value: 1 },
+                { label: 'Shipped', value: 2 },
+                { label: 'Completed', value: 3 },
+                { label: 'Cancelled', value: 4 }
+            ],
 
             years: [],
             months: [
@@ -135,14 +161,18 @@ export default {
             filters: {
                 year: null,
                 month: null,
-                country: ''
+                country: '',
+                status: null
             },
             columns: [
                 { name: 'orderId', label: 'ID', field: 'orderId', align: 'center'},
                 { name: 'customerName', label: 'Customer', field: 'customerName', align: 'center' },
-                { name: 'orderDate', label: 'Order Date', field: 'orderDate', align: 'center' },
+                { name: 'orderDate', label: 'Order Date', field: 'orderDate', align: 'center', 
+                format: val => { 
+                if (!val) return '' 
+                    return new Date(val).toLocaleDateString() }},
                 { name: 'country', label: 'Country', field: 'country', align: 'center' },
-                { name: 'status', label: 'Status', field: 'status', align: 'center' },
+                { name: 'status', label: 'Status', field: 'status', align: 'center',},
                 { name: 'totalAmount', label: 'Total', field: 'totalAmount', align: 'center',  format: val => new Intl.NumberFormat('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}).format(val ?? 0)},
                 { name: 'productCount', label: 'Products', field: 'productCount', align: 'center' },
                 { name: 'actions', label: 'Actions', field: 'actions', align: 'center'}
@@ -177,7 +207,8 @@ export default {
                     params: {
                         year: this.filters.year,
                         month: this.filters.month,
-                        country: this.filters.country
+                        country: this.filters.country || null,
+                        status: this.filters.status ?? null
                     }
                 })
 

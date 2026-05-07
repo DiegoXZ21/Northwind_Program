@@ -1,11 +1,12 @@
 <template>
     <q-select
-        v-model="selectedEmployee"
+        :model-value="modelValue"
+        @update:model-value="$emit('update:modelValue', $event)"
         :options="employees"
-        option-value="employeeId"
         option-label="employeeName"
-        label="Employee"
-        @update:model-value="updateEmployee"    
+        option-value="employeeId"
+        emit-value
+        map-options
     />
 </template>
 

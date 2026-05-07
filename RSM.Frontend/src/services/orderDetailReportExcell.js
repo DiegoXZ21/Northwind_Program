@@ -36,7 +36,7 @@ export async function generateOrderDetailExcel(order) {
 
     sheet.mergeCells("A4:G4")
     sheet.getCell("A4").value =
-        `Order ID: ${order.orderId} | Customer: ${order.customerName || "N/A"} | Status: ${statusMap[order.status]}`
+        `Order ID: ${order.orderId} | Customer: ${order.customerName || "N/A"} | Status: ${statusMap[order.status]} | Freight: $${(order.freight ?? 0).toFixed(2)}`
 
     const headerRow = sheet.addRow([
         "Product",

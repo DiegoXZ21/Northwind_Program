@@ -155,7 +155,8 @@ export default {
         region: '',
         country: '',
         postalCode: '',
-        shipperId: null
+        shipperId: null,
+        freight: 0
       },
       loading: false,
 
@@ -219,7 +220,8 @@ export default {
           region: data.region ?? '',
           country: data.country ?? '',
           postalCode: data.postalCode ?? '',
-          shipperId: data.shipperId ?? null
+          shipperId: data.shipperId ?? null,
+          freight: data.freight ?? 0
         }
 
       } catch (error) {
@@ -379,6 +381,7 @@ export default {
 
         latitude: this.order.latitude,
         longitude: this.order.longitude,
+        freight: this.shipping.freight,
 
         products: this.order.products.map(p => ({
           productId: p.productId,
@@ -396,7 +399,8 @@ export default {
 
     exportExcel() {
       generateOrderDetailExcel({
-        ...this.order
+        ...this.order,
+        ...this.shipping
       })
     },
     async deleteOrder() {
@@ -408,7 +412,7 @@ export default {
           message: "Order deleted successfully"
         })
 
-        this.$router.push('/orders') // redirigir al listado
+        this.$router.push('/orders')
 
       } catch (error) {
         this.$q.notify({

@@ -16,7 +16,6 @@ export function generateOrderDetailPDF(order) {
     const pageCount = doc.internal.getNumberOfPages()
     const pageHeight = doc.internal.pageSize.height
 
-    // HEADER
     doc.setFillColor(31, 78, 120)
     doc.rect(0, 0, 210, 22, "F")
 
@@ -27,7 +26,6 @@ export function generateOrderDetailPDF(order) {
     doc.setFontSize(10)
     doc.text("ORDER DETAIL REPORT", 14, 18)
 
-    // FOOTER
     doc.setFillColor(31, 78, 120)
     doc.rect(0, pageHeight - 12, 210, 12, "F")
 
@@ -46,7 +44,6 @@ export function generateOrderDetailPDF(order) {
     )
   }
 
-  // INFO GENERAL
   doc.setTextColor(0, 0, 0)
   doc.setFontSize(10)
 
@@ -54,13 +51,12 @@ export function generateOrderDetailPDF(order) {
   doc.text(`Customer: ${order.customerName}`, 14, 36)
   doc.text(`Date: ${new Date(order.orderDate).toLocaleDateString()}`, 14, 42)
   doc.text(`Status: ${statusMap[order.status]}`, 14, 48)
+  doc.text(`Freight: $${(order.freight ?? 0).toFixed(2)}`, 14, 54)
 
-  // SHIPPING
-  doc.text("Shipping:", 14, 58)
-  doc.text(`${order.shippingAddress || ""}`, 14, 64)
-  doc.text(`${order.city || ""}, ${order.country || ""}`, 14, 70)
+  doc.text("Shipping:", 14, 64)
+  doc.text(`${order.shippingAddress || ""}`, 14, 70)
+  doc.text(`${order.city || ""}, ${order.country || ""}`, 14, 76)
 
-  // TOTAL
   const total = order.products.reduce(
     (sum, p) => sum + (p.unitPrice * p.quantity * (1 - p.discount)),
     0
@@ -70,7 +66,6 @@ export function generateOrderDetailPDF(order) {
   doc.text(`Total: $${total.toFixed(2)}`, 150, 48)
   doc.setFont(undefined, "normal")
 
-  // TABLA PRODUCTOS
   autoTable(doc, {
     startY: 80,
     head: [["Product", "Price", "Qty", "Discount", "Subtotal"]],
