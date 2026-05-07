@@ -14,17 +14,17 @@ namespace RSM.Backend.Controllers
         }
 
         // GET: api/shippers
-        [HttpGet("sample")]
-        public IActionResult GetSample()
+                [HttpGet("shippers")]
+        public IActionResult GetShippers()
         {
             try
             {
-                var shippers = _shipperService.GetShippers();
-                return Ok(shippers);
+                var result = _shipperService.GetShippers();
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                return BadRequest($"Error when getting Shippers: {ex.Message}");
+                return BadRequest($"Error getting shippers: {ex.Message}");
             }
         }
 

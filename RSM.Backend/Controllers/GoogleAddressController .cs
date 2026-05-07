@@ -20,8 +20,6 @@ namespace RSM.Backend.Controllers
         public async Task<IActionResult> Validate(AddressDto dto)
         {
             var result = await _service.ValidateAddressAsync(dto);
-            Console.WriteLine("VALIDATION RESULT:");
-            Console.WriteLine(JsonSerializer.Serialize(result));
             return Ok(result);
         }
     }

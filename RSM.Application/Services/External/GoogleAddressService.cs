@@ -55,8 +55,6 @@ namespace RSM.Application.Services.External
 
             var location = data?.result?.geocode?.location;
 
-            var verdict = data?.result?.verdict;
-
             return new AddressValidationResult
             {
                 Latitude = location?.latitude,

@@ -361,7 +361,7 @@ export default {
         },
         async loadShippers() {
             try {
-                const res = await api.get('/Order/shippers')
+                const res = await api.get('/Shippers/shippers')
 
                 this.shippers = res.data.map(s => ({
                     label: s.companyName,

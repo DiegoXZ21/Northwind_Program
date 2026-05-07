@@ -9,11 +9,9 @@ namespace RSM.Backend.Controllers
     public class OrderController : ControllerBase
     {
         public readonly IOrderService _orderService;
-        public readonly IShipperService _shipperService;
-        public OrderController(IOrderService orderService, IShipperService shipperService)
+        public OrderController(IOrderService orderService)
         {
             _orderService = orderService;
-            _shipperService = shipperService;
         }
 
         [HttpGet]
@@ -91,19 +89,7 @@ namespace RSM.Backend.Controllers
             }
         }
 
-        [HttpGet("shippers")]
-        public IActionResult GetShippers()
-        {
-            try
-            {
-                var result = _shipperService.GetShippers();
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest($"Error getting shippers: {ex.Message}");
-            }
-        }
+
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteOrder(int id)
