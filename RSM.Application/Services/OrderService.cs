@@ -267,15 +267,33 @@ namespace RSM.Application.Services
 
                 if (existingDetail != null)
                 {
-                    int diff = updatedItem.Quantity - existingDetail.Quantity;
+                    if (updatedItem.Quantity == existingDetail.Quantity)
+                    {
+                        existingDetail.Discount = (float)updatedItem.Discount;
+                    }
 
-                    if (diff > 0 && (product.UnitsInStock ?? 0) < diff)
-                        throw new Exception($"Not enough stock for {product.ProductName}");
+                    else if (updatedItem.Quantity > existingDetail.Quantity)
+                    {
+                        int extraNeeded = updatedItem.Quantity - existingDetail.Quantity;
 
-                    product.UnitsInStock = (short?)(product.UnitsInStock - diff);
+                        if ((product.UnitsInStock ?? 0) < extraNeeded)
+                            throw new Exception($"Not enough stock for {product.ProductName}");
 
-                    existingDetail.Quantity = (short)updatedItem.Quantity;
-                    existingDetail.Discount = (float)updatedItem.Discount;
+                        product.UnitsInStock = (short?)((product.UnitsInStock ?? 0) - extraNeeded);
+
+                        existingDetail.Quantity = (short)updatedItem.Quantity;
+                        existingDetail.Discount = (float)updatedItem.Discount;
+                    }
+
+                    else
+                    {
+                        int returnedStock = existingDetail.Quantity - updatedItem.Quantity;
+
+                        product.UnitsInStock = (short?)((product.UnitsInStock ?? 0) + returnedStock);
+
+                        existingDetail.Quantity = (short)updatedItem.Quantity;
+                        existingDetail.Discount = (float)updatedItem.Discount;
+                    }
                 }
                 else
                 {

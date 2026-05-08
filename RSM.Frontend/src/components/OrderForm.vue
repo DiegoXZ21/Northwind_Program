@@ -165,9 +165,7 @@
             </div>
         </div>
 
-        <div class="q-mt-md">
-        <q-btn label="Save Order" type="submit" color="primary" />
-        </div>
+
 
         <q-card class="q-pa-md q-mt-md">
 
@@ -190,6 +188,9 @@
 
         </q-card>
 
+        <div class="q-mt-md">
+            <q-btn label="Save Order" type="submit" color="primary" />
+        </div>
         <!-- Customers Modal -->
     <customer-modal v-if="showCustomerModal" v-model="showCustomerModal" @select="setCustomer" />
 
