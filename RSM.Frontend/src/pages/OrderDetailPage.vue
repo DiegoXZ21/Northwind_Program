@@ -210,6 +210,7 @@ export default {
           longitude: data.longitude,
           products: (data.products ?? []).map(p => ({
             ...p,
+            originalQuantity: p.quantity,
             discount: Number(Number(p.discount).toFixed(2))
           }))
         }
@@ -285,9 +286,12 @@ export default {
 
     async saveProducts() {
       try {
-        const invalidProduct = this.order.products.find(p =>
-          p.quantity > (p.unitsInStock ?? 0)
-        )
+        const invalidProduct = this.order.products.find(p => {
+          const extraNeeded = p.quantity - (p.originalQuantity ?? 0)
+
+          return extraNeeded > 0 &&
+                  extraNeeded > (p.unitsInStock ?? 0)
+        })
 
         if (invalidProduct) {
           this.$q.notify({
