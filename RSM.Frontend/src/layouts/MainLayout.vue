@@ -7,7 +7,7 @@
 
         
         <q-toolbar-title>
-          RSM Order Management
+          NORTHWIND TRADERS
         </q-toolbar-title>
 
         
